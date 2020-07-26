@@ -648,7 +648,7 @@ class UnknownBytesField(Field):
 
     def readFromBuffer(self, owner, buffer, offset, checkExpectedValue):
         value = self.structFormat.unpack_from(buffer, offset)[0]
-        if checkExpectedValue and self.expectedValue != None and value != self.expectedValue:
+        if checkExpectedValue and self.expectedValue != None and value != self.expectedValue and owner.structureDescription.structureName != "PATU":
             raise Exception("Expected that %sV%s.%s has always the value %s, but it was %s" % (owner.structureDescription.structureName, owner.structureDescription.structureVersion, self.name, self.expectedValue, value))
 
         setattr(owner, self.name, value)
