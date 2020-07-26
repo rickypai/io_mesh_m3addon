@@ -34,7 +34,7 @@ import math
 from bpy_extras import io_utils
 import bpy.types as bt
 from os import path
-
+import os
 
 def toBlenderQuaternion(m3Quaternion):
     return mathutils.Quaternion((m3Quaternion.w, m3Quaternion.x, m3Quaternion.y, m3Quaternion.z))
@@ -417,6 +417,9 @@ class Importer:
 
     def importM3BasedOnM3ImportOptions(self, scene: bt.Scene):
         fileName = scene.m3_import_options.path
+        baseName = os.path.splitext(os.path.basename(fileName))[0]
+        print("Importing %s from %s..." % (baseName, fileName))
+
         contentToImport = scene.m3_import_options.contentToImport
         self.rootDirectory = scene.m3_import_options.rootDirectory
         if (self.rootDirectory == ""):
@@ -433,7 +436,7 @@ class Importer:
             self.scene.m3_animation_ids.clear()
             self.storeModelId()
             self.createAnimations()
-            self.createArmatureObject()
+            self.createArmatureObject(baseName)
             self.createBones()
             self.importVisibilityTest()
         self.createMaterials()
@@ -478,11 +481,11 @@ class Importer:
     def storeModelId(self):
         self.addAnimIdData(self.model.uniqueUnknownNumber, objectId=(shared.animObjectIdModel), animPath="")
 
-    def createArmatureObject(self):
+    def createArmatureObject(self, name):
         #bpy.ops.object.mode_set(mode='OBJECT')
         #alternative: armature = bpy.ops.object.armature_add(view_align=False,enter_editmode=False, location=location, rotation=(0,0,0), layers=firstLayerOnly)
         scene = bpy.context.scene
-        armatureObject = bpy.data.objects.new("Armature Object", self.armature)
+        armatureObject = bpy.data.objects.new("%s Armature Object" % name, self.armature)
         armatureObject.location = scene.cursor.location
         scene.collection.objects.link(armatureObject)
         scene.view_layers[0].objects.active = armatureObject
