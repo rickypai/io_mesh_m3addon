@@ -292,6 +292,7 @@ def selectOrCreateBone(scene, boneName):
         if armatureObject is None:
             armature = bpy.data.armatures.new(name="Armature")
             armatureObject = bpy.data.objects.new("Armature", armature)
+            # TODO: support armature object in collection
             scene.collection.objects.link(armatureObject)
         else:
             armature = armatureObject.data

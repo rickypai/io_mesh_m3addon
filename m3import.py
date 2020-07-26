@@ -161,7 +161,7 @@ def visualizeMatrix(matrix, at3DCursor):
     zVertex = oVertex + matrix3x3.col[2]
     vertices = [oVertex, xVertex,yVertex,zVertex]
     edges = [(0,1),(0,2),(0,3)]
-    bpy.context.scene.collection.objects.link(meshObject)
+    self.collection.objects.link(meshObject)
     mesh.from_pydata(vertices, edges, [])
     mesh.update(calc_edges=True)
 
@@ -426,6 +426,9 @@ class Importer:
             self.rootDirectory = path.dirname(fileName)
         self.scene = scene
         self.model = m3.loadModel(fileName)
+
+        self.createCollection(baseName)
+
         if contentToImport != "MESH_WITH_MATERIALS_ONLY":
             self.createArmature(baseName)
         scene.render.fps = FRAME_RATE
@@ -481,6 +484,10 @@ class Importer:
     def storeModelId(self):
         self.addAnimIdData(self.model.uniqueUnknownNumber, objectId=(shared.animObjectIdModel), animPath="")
 
+    def createCollection(self, name):
+        self.collection = bpy.data.collections.new(name)
+        bpy.context.scene.collection.children.link(self.collection)
+
     def createArmature(self, name):
         self.armature = bpy.data.armatures.new(name="%s Armature" % name)
 
@@ -490,7 +497,7 @@ class Importer:
         scene = bpy.context.scene
         armatureObject = bpy.data.objects.new("%s Armature Object" % name, self.armature)
         armatureObject.location = scene.cursor.location
-        scene.collection.objects.link(armatureObject)
+        self.collection.objects.link(armatureObject)
         scene.view_layers[0].objects.active = armatureObject
         armatureObject.select_set(True)
         self.armatureObject = armatureObject
@@ -1143,7 +1150,7 @@ class Importer:
                     meshObject.location = scene.cursor.location
                     meshObject.show_name = True
 
-                    scene.collection.objects.link(meshObject)
+                    self.collection.objects.link(meshObject)
 
                     physics_shape.meshObjectName = meshObject.name
 
@@ -1312,7 +1319,7 @@ class Importer:
                 meshObject = bpy.data.objects.new(preferedMeshName, mesh)
                 meshObject.location = self.scene.cursor.location
                 meshObject.show_name = True
-                self.scene.collection.objects.link(meshObject)
+                self.collection.objects.link(meshObject)
 
                 mesh.m3_material_name = self.getNameOfMaterialWithReferenceIndex(m3Object.materialReferenceIndex)
 
