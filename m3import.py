@@ -417,8 +417,13 @@ class Importer:
 
     def importM3BasedOnM3ImportOptions(self, scene: bt.Scene):
         fileName = scene.m3_import_options.path
+        prefixName = scene.m3_import_options.prefixName
+
         baseName = os.path.splitext(os.path.basename(fileName))[0]
         print("Importing %s from %s..." % (baseName, fileName))
+
+        if prefixName != None and prefixName != "":
+            baseName = prefixName
 
         contentToImport = scene.m3_import_options.contentToImport
         self.rootDirectory = scene.m3_import_options.rootDirectory

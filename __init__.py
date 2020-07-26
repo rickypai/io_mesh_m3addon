@@ -61,13 +61,13 @@ import bpy
 from bpy.props import StringProperty
 import bpy.types as bt
 from bpy_extras.io_utils import ExportHelper, ImportHelper
+from bpy.props import *
 import mathutils
 import math
 from . import shared
 from .shared import selectBone, removeBone, selectOrCreateBone, selectBoneIfItExists
 from . import cm
 from . import ui
-
 
 def boneNameSet():
     boneNames = set()
@@ -1644,6 +1644,7 @@ class M3ImportOptions(bpy.types.PropertyGroup):
     recalculateRestPositionBones : bpy.props.BoolProperty(default=False, options=set())
     teamColor : bpy.props.FloatVectorProperty(default=(1.0, 0.0, 0.0), min = 0.0, max = 1.0, name="team color", size=3, subtype="COLOR", options=set(), description="Team color place holder used for generated blender materials")
     contentToImport : bpy.props.EnumProperty(default="EVERYTHING", items=contentToImportList, options=set())
+    prefixName : bpy.props.StringProperty(name="prefixName", default="", options=set())
 
 
 class M3Warp(bpy.types.PropertyGroup):
@@ -4379,6 +4380,11 @@ class M3_OT_import(bpy.types.Operator, ImportHelper):
     filename_ext = ".m3"
     filter_glob : StringProperty(default="*.m3;*.m3a", options={'HIDDEN'})
 
+    prefixName : StringProperty(
+        name = "Prefix Name",
+        description = "Name used for the prefix of imported objects",
+        default = "")
+
     filepath : bpy.props.StringProperty(
         name="File Path",
         description="File path used for importing the simple M3 file",
@@ -4390,12 +4396,20 @@ class M3_OT_import(bpy.types.Operator, ImportHelper):
         if not "m3import" in locals():
             from . import m3import
         scene.m3_import_options.path = self.properties.filepath
+        scene.m3_import_options.prefixName = self.properties.prefixName
         m3import.importM3BasedOnM3ImportOptions(scene)
         return {'FINISHED'}
 
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
+
+    def draw(self, context):
+        layout = self.layout
+
+        box = layout.box()
+        box.label(text = "Prefix Name")
+        box.prop(self, "prefixName", icon_only=True)
 
 class M3_OT_conertBlenderToM3NormalMap(bpy.types.Operator):
     '''Convert a blender normal map to a M3 one'''
