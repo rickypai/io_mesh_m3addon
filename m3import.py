@@ -453,7 +453,7 @@ class Importer:
             self.createAttachmentPoints()
             self.createProjections()
             self.createWarps()
-        self.createMesh()
+        self.createMesh(baseName)
 
         if contentToImport != "MESH_WITH_MATERIALS_ONLY":
             # init stcs of animations at last
@@ -1260,7 +1260,7 @@ class Importer:
     def getNameOfMaterialWithReferenceIndex(self, materialReferenceIndex):
         return self.materialReferenceIndexToNameMap[materialReferenceIndex]
 
-    def createMesh(self):
+    def createMesh(self, name):
         model = self.model
         if model.getNamedBit("vFlags", "hasVertices") is not True:
             if len(self.model.vertices) > 0:
@@ -1305,7 +1305,7 @@ class Importer:
 
                 boneIndexLookup = model.boneLookup[region.firstBoneLookupIndex:region.firstBoneLookupIndex + region.numberOfBoneLookupIndices]
                 numberOfBones = len(boneIndexLookup)
-                preferedMeshName = "Mesh"
+                preferedMeshName = "%s Mesh" % name
                 if numberOfBones == 1:
                     preferedMeshName = self.model.bones[boneIndexLookup[0]].name
                 mesh = bpy.data.meshes.new(preferedMeshName)
