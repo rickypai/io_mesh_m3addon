@@ -427,7 +427,7 @@ class Importer:
         self.scene = scene
         self.model = m3.loadModel(fileName)
         if contentToImport != "MESH_WITH_MATERIALS_ONLY":
-            self.armature = bpy.data.armatures.new(name="Armature")
+            self.createArmature(baseName)
         scene.render.fps = FRAME_RATE
         self.animations = []
         self.animIdToLongAnimIdMap = {}
@@ -480,6 +480,9 @@ class Importer:
 
     def storeModelId(self):
         self.addAnimIdData(self.model.uniqueUnknownNumber, objectId=(shared.animObjectIdModel), animPath="")
+
+    def createArmature(self, name):
+        self.armature = bpy.data.armatures.new(name="%s Armature" % name)
 
     def createArmatureObject(self, name):
         #bpy.ops.object.mode_set(mode='OBJECT')
